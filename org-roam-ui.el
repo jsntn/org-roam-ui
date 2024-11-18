@@ -179,7 +179,7 @@ This serves the web-build and API over HTTP."
   :group 'org-roam-ui
   :init-value nil
   (cond
-   (org-roam-ui-mode
+   ((and org-roam-ui-mode (not (org-roam-ui-server-runningp)))
    ;;; check if the default keywords actually exist on `orb-preformat-keywords'
    ;;; else add them
     (setq-local httpd-port org-roam-ui-port)
@@ -200,6 +200,10 @@ This serves the web-build and API over HTTP."
       (httpd-stop)
       (remove-hook 'after-save-hook #'org-roam-ui--on-save)
       (org-roam-ui-follow-mode -1)))))
+
+(defun org-roam-ui-server-runningp ()
+  "True if the server is running or listening, otherwise false."
+  (if (member (process-status org-roam-ui-ws-server) '(listen run)) t))
 
 (defun org-roam-ui--ws-on-open (ws)
   "Open the websocket WS to org-roam-ui and send initial data."
