@@ -180,6 +180,7 @@ This serves the web-build and API over HTTP."
   :init-value nil
   (cond
    ((and org-roam-ui-mode (not (org-roam-ui-server-runningp)))
+    (message "org-roam-ui server :: starting up...")
    ;;; check if the default keywords actually exist on `orb-preformat-keywords'
    ;;; else add them
     (setq-local httpd-port org-roam-ui-port)
@@ -187,16 +188,20 @@ This serves the web-build and API over HTTP."
     (setq org-roam-ui--roam-directory org-roam-directory)
     (httpd-start)
     (setq org-roam-ui-ws-server
-          (websocket-server
-           35903
-           :host 'local
-           :on-open #'org-roam-ui--ws-on-open
-           :on-message #'org-roam-ui--ws-on-message
-           :on-close #'org-roam-ui--ws-on-close))
+	  (websocket-server
+	   35903
+	   :host 'local
+	   :on-open #'org-roam-ui--ws-on-open
+	   :on-message #'org-roam-ui--ws-on-message
+	   :on-close #'org-roam-ui--ws-on-close))
     (when org-roam-ui-open-on-start (org-roam-ui-open)))
+   (org-roam-ui-mode
+    (message (format "org-roam-ui server already runnning.")))
    (t
     (progn
-      (websocket-server-close org-roam-ui-ws-server)
+      (message "org-roam-ui server :: shutting down...")
+      (if org-roam-ui-ws-server
+	  (websocket-server-close org-roam-ui-ws-server))
       (httpd-stop)
       (remove-hook 'after-save-hook #'org-roam-ui--on-save)
       (org-roam-ui-follow-mode -1)))))
