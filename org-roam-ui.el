@@ -203,7 +203,7 @@ This serves the web-build and API over HTTP."
 
 (defun org-roam-ui-server-runningp ()
   "True if the server is running or listening, otherwise false."
-  (if (member (process-status org-roam-ui-ws-server) '(listen run)) t))
+  (and org-roam-ui-ws-server (member (process-status org-roam-ui-ws-server) '(listen run)) t))
 
 (defun org-roam-ui--ws-on-open (ws)
   "Open the websocket WS to org-roam-ui and send initial data."
